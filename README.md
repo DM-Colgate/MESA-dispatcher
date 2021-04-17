@@ -14,6 +14,7 @@ git clone https://github.com/deionizedoatmeal/MESA-dispatcher.git
 ```
 
 ## Usage
+# `deploy.sh`
 ```
 This script:
 1) creates new MESA work directories,
@@ -36,9 +37,10 @@ options:
 [DM DENSITY]   Dark Matter density in GeV/cm^3.
 [DM THREADS]   Number of threads to run on.
 ```
-
 This can be printed out with `deploy -h`.
 Example usage as follows:
 ```
 deploy MESA_inlists 1d1 1d11 1d14 32
 ```
+This is intended to be used in a larger script, such as the example in `batch.sh`.
+
