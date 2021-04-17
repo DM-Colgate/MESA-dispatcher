@@ -14,7 +14,7 @@ git clone https://github.com/deionizedoatmeal/MESA-dispatcher.git
 ```
 
 ## Usage
-# `deploy.sh`
+### `deploy.sh`
 ```
 This script:
 1) creates new MESA work directories,
