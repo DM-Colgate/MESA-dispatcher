@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 # execute script from repo
 cd ${DIR}
 
-# cp bin/* ${HOME}/.local/bin/.
+cp bin/* ${HOME}/.local/bin/.
 
 TRUEPATH=$"0"
 echo "$PATH" | grep -q ${HOME}/.local/binbin/ && TRUEPATH=$"1"
