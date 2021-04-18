@@ -10,6 +10,7 @@
 # 4) copies inlist into log directory
 # 5) imports run_star_extras and compiles
 # 6) submits job
+set -e
 
 Help()
 {
