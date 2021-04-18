@@ -62,15 +62,16 @@ THREADS=$6
 FULLNAME=$"$NAME$MASS"
 
 # remove trailing slash if its there
-DIR=${$DIR%/}
+DIR=${2%/}
 
 # make a new MESA work DIR
 new-star-work ${FULLNAME}
-cp ${DIR}/inlist_template ${NAME}/inlist
-cp ${DIR}/submit_template.sh ${NAME}/submit.sh
-cp ${DIR}/history_columns.list ${NAME}/.
-cp ${DIR}/profile_columns.list ${NAME}/.
-cd ${NAME}
+cp ${DIR}/inlists/inlist_template ${FULLNAME}/inlist
+cp ${DIR}/inlists/submit_template.sh ${FULLNAME}/submit.sh
+cp ${DIR}/inlists/history_columns.list ${FULLNAME}/.
+cp ${DIR}/inlists/profile_columns.list ${FULLNAME}/.
+cp ${DIR}/run_star_extras_src/capture.f ${FULLNAME}/src/run_star_extras.f
+cd ${FULLNAME}
 
 # fill out the relevant feilds of the inlist
 set-inlist inlist ${NAME} ${MASS} ${MDM} ${RHODM}
@@ -82,10 +83,12 @@ cp inlist LOGS/${FULLNAME}/.
 # fill in the submit script
 set-sub submit.sh ${FULLNAME} ${THREADS}
 
-# move run_star_extras.f in and compile
-place-cl-mk ${DIR}
+# clean and compile
+./clean
+./mk
 
 # submit the job
 qsub submit.sh 
 
+echo
 echo "Hog #"$FULLNAME" has been notified of your location."

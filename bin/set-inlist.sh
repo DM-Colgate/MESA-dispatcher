@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # find what line intital mass is on
-LINE=$(cat $1 | grep -hnr "initial_mass" | head -1 | cut -d ":" -f1)
+LINE=$(cat $1 | grep -n "initial_mass" | cut -d ":" -f1)
 
 # pop inital mass from the file
 sed -i '/initial_mass/d' ./${1}
@@ -14,7 +14,7 @@ NEWMASS="$LINE$WORDS$3"
 sed -i "${NEWMASS}" ${1}
 
 # find what line log dir is on
-LINE=$(cat $1 | grep -hnr "log_directory" | head -1 | cut -d ":" -f1)
+LINE=$(cat $1 | grep -n "log_directory" | cut -d ":" -f1)
 
 # pop inital mass from the file
 sed -i '/log_directory/d' ./${1}
@@ -28,7 +28,7 @@ NEWLOG="$LINE$WORDS$2$3$END"
 sed -i "${NEWLOG}" ${1}
 
 # find what line history is on
-LINE=$(cat $1 | grep -hnr "star_history_name" | head -1 | cut -d ":" -f1)
+LINE=$(cat $1 | grep -n "star_history_name" | cut -d ":" -f1)
 
 # pop inital mass from the file
 sed -i '/star_history_name/d' ./${1}
@@ -43,7 +43,7 @@ sed -i "${NEWHIST}" ${1}
 
 
 # find what line DM mass is on
-LINE=$(cat $1 | grep -hnr "X_CTRL(1)" | head -1 | cut -d ":" -f1)
+LINE=$(cat $1 | grep -n "X_CTRL(1)" | cut -d ":" -f1)
 
 # pop inital mass from the file
 sed -i '/X_CTRL(1)/d' ./${1}
@@ -57,7 +57,7 @@ sed -i "${NEWDM}" ${1}
 
 
 # find what line DM mass is on
-LINE=$(cat $1 | grep -hnr "X_CTRL(2)" | head -1 | cut -d ":" -f1)
+LINE=$(cat $1 | grep -n "X_CTRL(2)" | cut -d ":" -f1)
 
 # pop inital mass from the file
 sed -i '/X_CTRL(2)/d' ./${1}

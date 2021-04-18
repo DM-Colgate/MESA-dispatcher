@@ -3,7 +3,7 @@
 # $3 number of nodes
 
 # find what line ppn is on
-LINE=$(cat $1 | grep -hnr "ppn" | tail -1 | cut -d ":" -f1)
+LINE=$(cat $1 | grep -n "ppn" | cut -d ":" -f1)
 
 # pop
 sed -i '/ppn/d' ./${1}
@@ -18,7 +18,7 @@ sed -i "${NODE}" ${1}
 
 
 # find what line threads is on
-LINE=$(cat $1 | grep -hnr "OMP_NUM_THREADS" | tail -1 | cut -d ":" -f1)
+LINE=$(cat $1 | grep -n "OMP_NUM_THREADS" | cut -d ":" -f1)
 
 # pop
 sed -i '/OMP_NUM_THREADS/d' ./${1}
@@ -33,7 +33,7 @@ sed -i "${NEW}" ${1}
 
 
 # find what line name is on
-LINE=$(cat $1 | grep -hnr "\-N" | tail -1 | cut -d ":" -f1)
+LINE=$(cat $1 | grep -n "\-N" | cut -d ":" -f1)
 
 # pop
 sed -i '/-N/d' ./${1}
