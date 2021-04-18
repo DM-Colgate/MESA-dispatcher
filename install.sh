@@ -3,10 +3,14 @@
 # directory in the repository
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# execute script from repo
+# execute script from inside repo
 cd ${DIR}
 
-cp bin/* ${HOME}/.local/bin/.
+# copy to local bin and remove .sh 
+for f in bin/*.sh; do
+        NAME=${f::-3}
+        sudo cp -p $f ${HOME}/.local/bin/$NAME
+done
 
 TRUEPATH=$"0"
 echo "$PATH" | grep -q ${HOME}/.local/binbin/ && TRUEPATH=$"1"
