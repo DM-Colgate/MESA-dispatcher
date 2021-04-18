@@ -41,7 +41,7 @@ options:
 This can be printed out with `deploy -h`.
 Example usage as follows:
 ```
-deploy MESA_inlists 1d1 1d11 1d14 32
+deploy DK MESA_inlists 1d1 1d11 1d14 32
 ```
 This is intended to be used in a larger script, such as the example in `batch.sh`.
 

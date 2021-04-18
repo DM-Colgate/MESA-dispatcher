@@ -61,12 +61,15 @@ THREADS=$6
 # name od the run
 FULLNAME=$"$NAME$MASS"
 
+# remove trailing slash if its there
+DIR=${$DIR%/}
+
 # make a new MESA work DIR
 new-star-work ${FULLNAME}
-cp ${2}/inlists/inlist_template ${NAME}/inlist
-cp ${2}/inlists/submit_template.sh ${NAME}/submit.sh
-cp ${2}/inlists/history_columns.list ${NAME}/.
-cp ${2}/inlists/profile_columns.list ${NAME}/.
+cp ${DIR}/inlist_template ${NAME}/inlist
+cp ${DIR}/submit_template.sh ${NAME}/submit.sh
+cp ${DIR}/history_columns.list ${NAME}/.
+cp ${DIR}/profile_columns.list ${NAME}/.
 cd ${NAME}
 
 # fill out the relevant feilds of the inlist
