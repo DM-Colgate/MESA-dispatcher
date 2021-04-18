@@ -26,9 +26,10 @@ Help()
    echo "5) imports run_star_extras and compiles,"
    echo "6) and submits the job."
    echo
-   echo "syntax: deploy [TEMP DIR] [STAR MASS] [DM MASS] [DM DENSITY] [THREADS]"
+   echo "syntax: deploy [NAME] [TEMP DIR] [STAR MASS] [DM MASS] [DM DENSITY] [THREADS]"
    echo
    echo "options:"
+   echo "[NAME]         Name of run."
    echo "[TEMP DIR]     Dictory containing all templates."
    echo "[STAR MASS]    Inital mass of the star in solar masses."
    echo "[DM MASS]      Dark Matter mass in GeV."

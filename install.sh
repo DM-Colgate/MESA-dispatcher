@@ -8,21 +8,22 @@ cd ${DIR}
 
 # copy to local bin and remove .sh 
 for f in bin/*.sh; do
-        NAME=${f::-3}
-        sudo cp -p $f ${HOME}/.local/bin/$NAME
+        NAME=${f##*/} 
+        NAME=${NAME::-3}
+        cp -p $f ${HOME}/.local/bin/$NAME
 done
 
-TRUEPATH=$"0"
-echo "$PATH" | grep -q ${HOME}/.local/binbin/ && TRUEPATH=$"1"
+# TRUEPATH=$"0"
+# echo "$PATH" | grep -q ${HOME}/.local/bin && TRUEPATH=$"1"
 
-if [[ TRUEPATH == "1" ]]; then
-    exit
-else 
-    echo "Warning: ${HOME}/.local/bin/ is not in your \$PATH, make sure to add the line: "
-    echo
-    echo "export PATH=\"\$HOME/.local/bin:\$PATH\""
-    echo
-    echo "to your ~/.bashrc (or equivalent) file."
-fi
+# if [[ TRUEPATH == "1" ]]; then
+#     exit
+# else 
+echo "Warning: if ${HOME}/.local/bin is not in your \$PATH, make sure to add the line: "
+echo
+echo "export PATH=\"\$HOME/.local/bin:\$PATH\""
+echo
+echo "to your ~/.bashrc (or equivalent) file."
+# fi
 
 

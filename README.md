@@ -28,9 +28,10 @@ This script:
 5) imports run_star_extras and compiles,
 6) and submits the job.
 
-syntax: deploy [TEMP DIR] [STAR MASS] [DM MASS] [DM DENSITY] [THREADS]
+syntax: deploy [NAME] [TEMP DIR] [STAR MASS] [DM MASS] [DM DENSITY] [THREADS]
 
 options:
+[NAME]         Name of run.
 [TEMP DIR]     Dictory containing all templates.
 [STAR MASS]    Inital mass of the star in solar masses.
 [DM MASS]      Dark Matter mass in GeV.

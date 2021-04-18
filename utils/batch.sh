@@ -2,7 +2,7 @@
 # example of a script to launch a batch of MESA runs on the cluster at once
 
 
-echo "Dispatching hogs... please prepare for deallocation."
+echo "Dispatching feral hogs... please prepare for deallocation."
 
 # AA: m_chi = 1d3 and rho_chi = 1d6
 deploy AA 1d0 1d3 1d6 16
