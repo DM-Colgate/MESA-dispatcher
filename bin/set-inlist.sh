@@ -35,7 +35,7 @@ sed -i '/star_history_name/d' ./${1}
 
 # compose new log dirctory line
 WORDS="i\ \ \ \ \ \ star_history_name\ =\ \'history_"
-END="\'"
+END=".data\'"
 NEWHIST="$LINE$WORDS$2$3$END"
 
 # add new intital mass line
