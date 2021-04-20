@@ -71,7 +71,7 @@ cp ${DIR}/inlists/inlist_template ${FULLNAME}/inlist
 cp ${DIR}/inlists/submit_template.sh ${FULLNAME}/submit.sh
 cp ${DIR}/inlists/history_columns.list ${FULLNAME}/.
 cp ${DIR}/inlists/profile_columns.list ${FULLNAME}/.
-cp ${DIR}/run_star_extras_src/capture-lite.f ${FULLNAME}/src/run_star_extras.f
+cp ${DIR}/run_star_extras_src/capture_lite.f ${FULLNAME}/src/run_star_extras.f
 cd ${FULLNAME}
 
 # fill out the relevant feilds of the inlist
