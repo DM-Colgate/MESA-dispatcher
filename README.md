@@ -1,3 +1,6 @@
+# *Under Construction*
+Mostly hard coded to work with my cluster set up, planing to add a config file, amd some more inlist options to make it a more universally applicable tool.
+
 # MESA-dispatcher
 A set of bash and python scripts for painlessly submitting and analyzing many MESA runs at once.
 As of now these scripts are really only hard coded to work with MESA runs using my `run_star_extras.f` for Dark Matter capture.
