@@ -35,7 +35,8 @@ Help()
    echo "[STAR MASS]    Inital mass of the star in solar masses."
    echo "[DM MASS]      Dark Matter mass in GeV."
    echo "[DM DENSITY]   Dark Matter density in GeV/cm^3."
-   echo "[DM THREADS]   Number of threads to run on."
+   echo "[THREADS]      Number of OMP threads to use."
+   echo "[PPN]          Number of cluster threads to request."
    echo
 }
 
@@ -58,6 +59,7 @@ MASS=$3
 MDM=$4
 RHODM=$5
 THREADS=$6
+PPN=$7
 
 # name od the run
 FULLNAME=$"$NAME$MASS"
@@ -82,7 +84,7 @@ mkdir LOGS/${FULLNAME}
 cp inlist LOGS/${FULLNAME}/.
 
 # fill in the submit script
-set-sub submit.sh ${FULLNAME} ${THREADS}
+set-sub submit.sh ${FULLNAME} ${THREADS} ${PPN}
 
 # clean and compile
 ./clean

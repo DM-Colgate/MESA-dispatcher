@@ -1,6 +1,7 @@
 #!/bin/bash
 # $2 name
-# $3 number of nodes
+# $3 number of OMP threads
+# $4 PPN
 
 # find what line ppn is on
 LINE=$(cat $1 | grep -n "ppn" | cut -d ":" -f1)
@@ -10,7 +11,7 @@ sed -i '/ppn/d' ./${1}
 
 # compose
 WORDS="i#PBS\ -l\ nodes=1:ppn="
-NODE="$LINE$WORDS$3"
+NODE="$LINE$WORDS$4"
 
 # add new line
 sed -i "${NODE}" ${1}
