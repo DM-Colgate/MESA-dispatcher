@@ -13,6 +13,13 @@ for f in bin/*.sh; do
         cp -p $f ${HOME}/.local/bin/$NAME
 done
 
+# copy to local bin and remove .sh 
+for f in bin/*.py; do
+        NAME=${f##*/} 
+        NAME=${NAME::-3}
+        cp -p $f ${HOME}/.local/bin/$NAME
+done
+
 # TRUEPATH=$"0"
 # echo "$PATH" | grep -q ${HOME}/.local/bin && TRUEPATH=$"1"
 
