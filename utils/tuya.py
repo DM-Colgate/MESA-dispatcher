@@ -130,8 +130,8 @@ def assign_const():
 
 def mesa_dir(direc):
     arg1 = direc
-    arg = arg1.split('_')
-    hist= "history_" + arg[0] + ".data"
+    hist= "history_" + arg1 + ".data"
+    print(hist)
     direc = mr.MesaLogDir(log_path=arg1, history_file=hist)
     return direc
 
@@ -147,11 +147,11 @@ def mesa_prof(direc, profile):
     mesa_lab = year + " yr, " + lab_mass + " $M_{\\odot}$, " + model
     return (prof, mesa_lab, lab_mass)
 
-def gen_hist_labels(history):
+def gen_hist_labels(dirs, history):
     '''generate labels corresponding to history files'''
     labels = []
     for i in range(len(history)):
-        mass = str(round(history[i].star_mass[0], 2))
+        # mass = str(round(history[i].star_mass[0], 2))
         # check to see if its a DM star
         # if history[i].DM == 'True':
         #     DM = 'DM'
@@ -160,7 +160,8 @@ def gen_hist_labels(history):
 
         # combine the elements
         # labels.append(mass + " $M_{\\odot}$, " + DM)
-        labels.append(mass + " $M_{\\odot}$, DM")
+        # labels.append(mass + " $M_{\\odot}$, DM")
+        labels.append(dirs[i])
 
     # return our list of labels
     return labels
@@ -221,16 +222,57 @@ def save_plt(plt, name, args):
         top = args.yaxis[1]
         plt.xlin(btm, top)
 
+    if args.no_legend:
+       pass 
+    else:
+        plt.legend()
+
     # check file type params
     if args.PDF:
         plt.savefig(name+ ".pdf")
     else:
         plt.savefig(name + ".png", dpi = 400)
+    if args.show:
+        plt.show()
     plt.clf()
 
 def aninit():
     line.set_data([], [])
     return line,
+
+def space(args, history, profs):
+    '''determine how many profiles we want to plot and how to space them'''
+    # how many profiles do we want to plot?
+    if args.number == 0:
+        num = len(profs[j])
+    else:
+        num = args.number
+
+    # by what metric do we equispace them?
+    if args.spacing == "mass":
+                spacing = round(history.star_mass[-1]/num)
+    if args.spacing == "age":
+                spacing = round(history.star_age[-1]/num)
+    if args.spacing == "model":
+                spacing = round(len(profs)/num)
+    return spacing
+
+def spacechk(i, args, history, profs, spacing):
+    '''check if the ith profile is one we want to plot'''
+    # by what metric do we equispace them?
+    if args.spacing == "mass":
+        mod = round(history.star_mass[i]) % spacing
+    if args.spacing == "age":
+        mod = round(history.star_age[i]) % spacing
+    if args.spacing == "model":
+        mod = i % spacing
+
+    # should we skip the first model
+    if args.skip_first:
+        # print("IN SKIP FIRST")
+        if i == 0:
+            mod = 1
+    return mod
 
 ########
 # MAIN #
@@ -241,6 +283,7 @@ def main():
     parser.add_argument("--DMevo", help="plot DM params over time", action='store_true')
     parser.add_argument("--DMheat", help="plot radial DM heating profile", action='store_true')
     parser.add_argument("--DMprof", help="plot radial DM profile", action='store_true')
+    parser.add_argument("--DMprofAC", help="plot radial DM profile", action='store_true')
     parser.add_argument("--cpu", help="plot star time versus wall time", action='store_true')
     parser.add_argument("--HR", help="plot an HR diagram", action='store_true')
     parser.add_argument("--dMdt", help="plot total mass over time", action='store_true')
@@ -252,6 +295,7 @@ def main():
     parser.add_argument("--T", help="plot radial temperature profile", action='store_true')
     parser.add_argument("--L", help="plot radial luminosity profile, by source", action='store_true')
     parser.add_argument("--Edd", help="plot radial Eddington factor profile", action='store_true')
+    parser.add_argument("--Edd2", help="plot Freese Eddington factor profile", action='store_true')
     parser.add_argument("--beta", help="plot radial beta (P_gas/P) profile", action='store_true')
     parser.add_argument("--XYZ", help="plot radial composition profile", action='store_true')
     parser.add_argument("-n", "--number", help="how many profiles to plot, equispaced by interest", type=int, default=0)
@@ -279,6 +323,10 @@ def main():
     parser.add_argument("--xlin", help="force lin scale on x axis", action='store_true')
     parser.add_argument("--ylin", help="force lin scale on y axis", action='store_true')
     parser.add_argument("--PDF", help="produce PDFs of the plots", action='store_true')
+    parser.add_argument("-s", "--show", help="open plot in window", action='store_true')
+    parser.add_argument("--spacing", help="how to equispace profiles, by mass, age, or model", type=str, default="age")
+    parser.add_argument("--skip-first", help="don't plot the first profile model", action='store_true')
+    parser.add_argument("--no-legend", help="don't plot the legend", action='store_true')
     args = parser.parse_args()
 
     # print
@@ -301,6 +349,7 @@ def main():
     # set up some plotting stuff
     # fig = plt.figure()
     fig = plt.figure(figsize = (24,16))
+    plt.figure(figsize = (24,16))
     # plt.style.use('fast')
     palette = plt.get_cmap('magma')
     vir = plt.get_cmap('viridis')
@@ -347,7 +396,7 @@ def main():
 
         # create our legend labels
         print("generating history labels...")
-        hist_lab = gen_hist_labels(history)
+        hist_lab = gen_hist_labels(args.dir, history)
 
         # find the interesting profile indices
         print("fetching profile indices...")
@@ -451,7 +500,6 @@ def main():
 
         # make the plot
         plt.title("HR Diagram: " + filename)
-        plt.legend()
         plt.gca().invert_xaxis()
         plt.ylabel('log($L$) [$L_{\odot}$]')
         plt.xlabel('log($T_{eff}$) [K]')
@@ -541,7 +589,6 @@ def main():
         # make the plot
         progbarend()
         plt.title("Radius Over Time: " + filename)
-        plt.legend()
         plt.ylabel('Radius [$R_{\odot}$]')
         plt.yscale('log')
         plt.xlabel('Age [yr]')
@@ -556,7 +603,7 @@ def main():
             plt.plot(history[i].star_age, history[i].luminosity,
                     color=vir(i / len(history)),
                     ls = '-',
-                    linewidth=2,
+                    linewidth=1,
                     label=hist_lab[i])
             plt.plot(history[i].star_age, 10**history[i].log_Lnuc,
                     color=vir(i / len(history)),
@@ -645,7 +692,6 @@ def main():
         # make the plot
         progbarend()
         plt.title("Luminosity Over Time: " + filename)
-        plt.legend()
         plt.ylabel('Luminosity [$L_{\odot}$]')
         plt.yscale('log')
         plt.xlabel('Age [yr]')
@@ -735,7 +781,6 @@ def main():
         # make the plot
         progbarend()
         plt.title("Mass Over Time: " + filename)
-        plt.legend()
         plt.ylabel('Mass [$M_{\odot}$]')
         plt.yscale('log')
         plt.xlabel('Age [yr]')
@@ -745,12 +790,6 @@ def main():
     # dense
     if args.rho:
         for j in range(len(mrdirs)):
-            # how many profiles do we want to plot
-            if args.number == 0:
-                num = len(profs[j])
-            else:
-                num = args.number
-
             # loop thru different profile files
             progbarinit(len(profs[j]))
             for i in range(len(profs[j])):
@@ -758,26 +797,23 @@ def main():
                 progbar()
 
                 # is this one we want to plot?
-                spacing = round(len(profs[j])/num)
+                spacing = space(args, history[j], profs[j])
 
                 # modulo
-                if i % spacing == 0:
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
                     # get profile info from MESA reader
                     dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
 
                     # make actual plot
                     plt.plot(dat.radius, 10**(dat.logRho),
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = '-',
                             linewidth=1,
                             label=lab)
 
-                    # make progress bar
-
         # plot the plot
         progbarend()
         plt.title("Density Profile: " + filename)
-        plt.legend()
         plt.ylabel('Density [g cm$^{-3}$]')
         plt.yscale('log')
         plt.xlabel('Radius [$R_{\odot}$]')
@@ -787,26 +823,20 @@ def main():
     # crock pot
     if args.P:
         for j in range(len(mrdirs)):
-            # how many profiles do we want to plot
-            if args.number == 0:
-                num = len(profs[j])
-            else:
-                num = args.number
-
             # loop thru different profile files
             progbarinit(len(profs[j]))
             for i in range(len(profs[j])):
                 # is this one we want to plot?
-                spacing = round(len(profs[j])/num)
+                spacing = space(args, history[j], profs[j])
 
                 # modulo
-                if i % spacing == 0:
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
                     # get profile info from MESA reader
                     dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
 
                     # make actual plot
                     plt.plot(dat.radius, dat.pressure,
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = '-',
                             linewidth=1,
                             label=lab)
@@ -817,7 +847,6 @@ def main():
         # plot the plot
         progbarend()
         plt.title("Pressure Profile: " + filename)
-        plt.legend()
         plt.ylabel('Pressure [g cm$^{-1}$ s$^{-2}$]')
         plt.yscale('log')
         plt.xlabel('Radius [$R_{\odot}$]')
@@ -827,26 +856,20 @@ def main():
     # temp
     if args.T:
         for j in range(len(mrdirs)):
-            # how many profiles do we want to plot
-            if args.number == 0:
-                num = len(profs[j])
-            else:
-                num = args.number
-
             # loop thru different profile files
             progbarinit(len(profs[j]))
             for i in range(len(profs[j])):
                 # is this one we want to plot?
-                spacing = round(len(profs[j])/num)
+                spacing = space(args, history[j], profs[j])
 
                 # modulo
-                if i % spacing == 0:
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
                     # get profile info from MESA reader
                     dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
 
                     # make actual plot
                     plt.plot(dat.radius, dat.temperature,
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = '-',
                             linewidth=1,
                             label=lab)
@@ -857,7 +880,6 @@ def main():
         # plot the plot
         progbarend()
         plt.title("Temperature Profile: " + filename)
-        plt.legend()
         plt.ylabel('Temperature [K]')
         plt.yscale('log')
         plt.xlabel('Radius [$R_{\odot}$]')
@@ -867,36 +889,30 @@ def main():
     # lums
     if args.L:
         for j in range(len(mrdirs)):
-            # how many profiles do we want to plot
-            if args.number == 0:
-                num = len(profs[j])
-            else:
-                num = args.number
-
             # loop thru different profile files
             progbarinit(len(profs[j]))
             for i in range(len(profs[j])):
                 # is this one we want to plot?
-                spacing = round(len(profs[j])/num)
+                spacing = space(args, history[j], profs[j])
 
                 # modulo
-                if i % spacing == 0:
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
                     # get profile info from MESA reader
                     dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
 
                     # make actual plot
                     plt.plot(dat.radius, dat.luminosity,
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = '-',
                             linewidth=1,
                             label=lab)
                     plt.plot(dat.radius, dat.extra_L,
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = '--',
                             linewidth=1,
                             label="extra")
                     plt.plot(dat.radius, dat.luminosity - dat.extra_L,
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = ':',
                             linewidth=1,
                             label="other")
@@ -907,7 +923,6 @@ def main():
         # plot the plot
         progbarend()
         plt.title("Luminosity Profile: " + filename)
-        plt.legend()
         plt.ylabel('Luminosity [$L_{\odot}$]')
         plt.yscale('log')
         plt.xscale('log')
@@ -918,26 +933,20 @@ def main():
     # edd
     if args.Edd:
         for j in range(len(mrdirs)):
-            # how many profiles do we want to plot
-            if args.number == 0:
-                num = len(profs[j])
-            else:
-                num = args.number
-
             # loop thru different profile files
             progbarinit(len(profs[j]))
             for i in range(len(profs[j])):
                 # is this one we want to plot?
-                spacing = round(len(profs[j])/num)
+                spacing = space(args, history[j], profs[j])
 
                 # modulo
-                if i % spacing == 0:
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
                     # get profile info from MESA reader
                     dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
 
                     # make actual plot
-                    plt.plot(dat.radius, dat.luminosity/(10**(dat.log_L_div_Ledd)),
-                            color=vir(i / len(profs)),
+                    plt.plot(dat.radius, 10**(dat.log_L_div_Ledd),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = '-',
                             linewidth=1,
                             label=lab)
@@ -948,36 +957,62 @@ def main():
         # plot the plot
         progbarend()
         plt.title("Eddintgon Factor Profile: " + filename)
-        plt.legend()
         plt.ylabel('Eddington Factor $(\\frac{L(r)}{L_{edd}(r)})$')
         plt.yscale('log')
         plt.xlabel('Radius [$R_{\odot}$]')
         name = filename + "_Edd" 
         save_plt(plt, name, args)
 
-    # beta
-    if args.beta:
+    # edd2
+    if args.Edd2:
         for j in range(len(mrdirs)):
-            # how many profiles do we want to plot
-            if args.number == 0:
-                num = len(profs[j])
-            else:
-                num = args.number
-
             # loop thru different profile files
             progbarinit(len(profs[j]))
             for i in range(len(profs[j])):
                 # is this one we want to plot?
-                spacing = round(len(profs[j])/num)
+                spacing = space(args, history[j], profs[j])
 
                 # modulo
-                if i % spacing == 0:
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
+                    # get profile info from MESA reader
+                    dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
+
+                    # make actual plot
+                    plt.plot(dat.radius, 10**(dat.log_Lrad_div_Ledd),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
+                            ls = '-',
+                            linewidth=1,
+                            label=lab)
+
+                    # make progress bar
+                    progbar()
+
+        # plot the plot
+        progbarend()
+        plt.title("Eddintgon Factor Profile: " + filename)
+        plt.ylabel('Eddington Factor $(\\frac{L_{rad}(r)}{L_{edd}(r)})$')
+        plt.yscale('log')
+        plt.xlabel('Radius [$R_{\odot}$]')
+        name = filename + "_Edd2" 
+        save_plt(plt, name, args)
+
+    # beta
+    if args.beta:
+        for j in range(len(mrdirs)):
+            # loop thru different profile files
+            progbarinit(len(profs[j]))
+            for i in range(len(profs[j])):
+                # is this one we want to plot?
+                spacing = space(args, history[j], profs[j])
+
+                # modulo
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
                     # get profile info from MESA reader
                     dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
 
                     # make actual plot
                     plt.plot(dat.radius, dat.pgas/dat.pressure,
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = '-',
                             linewidth=1,
                             label=lab)
@@ -988,7 +1023,6 @@ def main():
         # plot the plot
         progbarend()
         plt.title("Beta Profile: " + filename)
-        plt.legend()
         plt.ylabel('$\\beta ~ (\\frac{P_{gas}(r)}{P(r)})$')
         plt.xlabel('Radius [$R_{\odot}$]')
         name = filename + "_beta" 
@@ -997,36 +1031,30 @@ def main():
     # composition
     if args.XYZ:
         for j in range(len(mrdirs)):
-            # how many profiles do we want to plot
-            if args.number == 0:
-                num = len(profs[j])
-            else:
-                num = args.number
-
             # loop thru different profile files
             progbarinit(len(profs[j]))
             for i in range(len(profs[j])):
                 # is this one we want to plot?
-                spacing = round(len(profs[j])/num)
+                spacing = space(args, history[j], profs[j])
 
                 # modulo
-                if i % spacing == 0:
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
                     # get profile info from MESA reader
                     dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
 
                     # make actual plot
                     plt.plot(dat.radius, dat.x_mass_fraction_H,
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = '-',
                             linewidth=1,
                             label="H, " + lab)
                     plt.plot(dat.radius, dat.y_mass_fraction_He,
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = '--',
                             linewidth=1,
                             label="He")
                     plt.plot(dat.radius, dat.z_mass_fraction_metals,
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = ':',
                             linewidth=1,
                             label="Z")
@@ -1037,7 +1065,6 @@ def main():
         # plot the plot
         progbarend()
         plt.title("Composition Profile: " + filename)
-        plt.legend()
         plt.ylabel('Composition Fraction')
         plt.yscale('log')
         plt.xlabel('Radius [$R_{\odot}$]')
@@ -1142,7 +1169,6 @@ def main():
         # make the plot
         progbarend()
         plt.title("Dark Matter Over Time: " + filename)
-        plt.legend()
         plt.yscale('log')
         plt.xlabel('Age [yr]')
         name = filename + "_DMevo" 
@@ -1151,26 +1177,20 @@ def main():
     # DM profile
     if args.DMheat:
         for j in range(len(mrdirs)):
-            # how many profiles do we want to plot
-            if args.number == 0:
-                num = len(profs[j])
-            else:
-                num = args.number
-
             # loop thru different profile files
             progbarinit(len(profs[j]))
             for i in range(len(profs[j])):
                 # is this one we want to plot?
-                spacing = round(len(profs[j])/num)
+                spacing = space(args, history[j], profs[j])
 
                 # modulo
-                if i % spacing == 0:
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
                     # get profile info from MESA reader
                     dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
 
                     # make actual plot
                     plt.plot(dat.radius, dat.extra_heat,
-                            color=vir(i / len(profs)),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
                             ls = '-',
                             linewidth=1,
                             label=lab)
@@ -1181,7 +1201,6 @@ def main():
         # plot the plot
         progbarend()
         plt.title("DM Heat Profile: " + filename)
-        plt.legend()
         plt.yscale('log')
         plt.xscale('log')
         plt.ylabel('$Q_{\\chi}(r)$ [ergs/s/g]')
@@ -1192,27 +1211,21 @@ def main():
 
     if args.DMprof:
         for j in range(len(mrdirs)):
-            # how many profiles do we want to plot
-            if args.number == 0:
-                num = len(profs[j])
-            else:
-                num = args.number
-
             # loop thru different profile files
             progbarinit(len(profs[j]))
             for i in range(len(profs[j])):
                 # is this one we want to plot?
-                spacing = round(len(profs[j])/num)
+                spacing = space(args, history[j], profs[j])
 
                 # modulo
-                if i % spacing == 0:
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
                     # get profile info from MESA reader
                     dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
 
                     # make actual plot
                     plt.plot(dat.radius, np.sqrt(dat.n_chi2),
-                            color=vir(i / len(profs)),
-                            ls = ':',
+                            color=vir(dat.star_age / history[j].star_age[-1]),
+                            ls = '-',
                             linewidth=1,
                             label=lab)
 
@@ -1222,13 +1235,45 @@ def main():
         # plot the plot
         progbarend()
         plt.title("DM profile: " + filename)
-        plt.legend()
         plt.yscale('log')
         plt.xscale('log')
         plt.xlabel('Radius [$R_{\odot}$]')
         plt.ylabel('$\int_{cell} n_{\\chi}(r)~ dV$')
         plt.ylim(bottom=10**(-14))
         name = filename + "_DMprof" 
+        save_plt(plt, name, args)
+
+    if args.DMprofAC:
+        for j in range(len(mrdirs)):
+            # loop thru different profile files
+            progbarinit(len(profs[j]))
+            for i in range(len(profs[j])):
+                # is this one we want to plot?
+                spacing = space(args, history[j], profs[j])
+
+                # modulo
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
+                    # get profile info from MESA reader
+                    dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
+
+                    # make actual plot
+                    plt.plot(dat.radius, np.sqrt(dat.rho_chi),
+                            color=vir(dat.star_age / history[j].star_age[-1]),
+                            ls = '-',
+                            linewidth=1,
+                            label=lab)
+
+                    # make progress bar
+                    progbar()
+
+        # plot the plot
+        progbarend()
+        plt.title("DM profile: " + filename)
+        plt.yscale('log')
+        plt.xscale('log')
+        plt.xlabel('Radius [$R_{\odot}$]')
+        plt.ylabel('$\int_{cell} n_{\\chi}(r)~ dV$')
+        name = filename + "_DMprofAC" 
         save_plt(plt, name, args)
 
     # time 
@@ -1245,7 +1290,6 @@ def main():
         # make the plot
         progbarend()
         plt.title("MESA Computation Time " + filename)
-        plt.legend()
         plt.ylabel('Ellapsed Wall Time')
         plt.xlabel('Age [yr]')
         name = filename + "_cpu" 
