@@ -61,12 +61,9 @@ Move `tuya.py` into your directory with `MESA` log directories in it. For exampl
 ```
 `./tuya.py -h` will print out the following help statement:
 ```
-usage: tuya.py [-h] [-D str [str ...]] [--DMevo] [--DMheat] [--DMprof] [--cpu] [--HR]
-               [--dMdt] [--dRdt] [--dLdt] [--dEddMaxdt] [--rho] [--P] [--T] [--L]
-               [--Edd] [--beta] [--XYZ] [-n int] [--Arho] [--AP] [--AT] [--AL]
-               [--AEdd] [--Abeta] [--AXYZ] [--poly float] [--Rnorm] [--dM] [--Mnorm]
-               [--dMstar] [--no-annotate] [-f str] [-d] [-p] [-x float float]
-               [-y float float] [--xlog] [--ylog] [--xlin] [--ylin] [--PDF]
+usage: tuya.py [-h] [-D str [str ...]] [--DMevo] [--DMheat] [--DMprof] [--DMprofAC] [--cpu] [--HR] [--dMdt] [--dRdt] [--dLdt] [--derrdt] [--drunerrdt] [--dEddMaxdt] [--rho] [--dm] [--P] [--T] [--L]
+               [--Edd] [--Edd2] [--beta] [--XYZ] [-n int] [--Arho] [--AP] [--AT] [--AL] [--AEdd] [--Abeta] [--AXYZ] [--poly float] [--Rnorm] [--dM] [--Mnorm] [--dMstar] [--no-annotate] [-f str] [-d]
+               [-p] [-x float float] [-y float float] [--xlog] [--ylog] [--xlin] [--ylin] [--PDF] [-s] [--spacing str] [--skip-first] [--no-legend]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -75,17 +72,22 @@ optional arguments:
   --DMevo               plot DM params over time
   --DMheat              plot radial DM heating profile
   --DMprof              plot radial DM profile
+  --DMprofAC            plot radial DM profile
   --cpu                 plot star time versus wall time
   --HR                  plot an HR diagram
   --dMdt                plot total mass over time
   --dRdt                plot total radius over time
   --dLdt                plot total luminosity over time, by source
+  --derrdt              plot rel_E_err over time
+  --drunerrdt           plot rel_run_E_err over time
   --dEddMaxdt           plot maximum Eddington factor over time
   --rho                 plot radial density profile
+  --dm                  plot radial mass per cell profile
   --P                   plot radial pressure profile
   --T                   plot radial temperature profile
   --L                   plot radial luminosity profile, by source
   --Edd                 plot radial Eddington factor profile
+  --Edd2                plot Freese Eddington factor profile
   --beta                plot radial beta (P_gas/P) profile
   --XYZ                 plot radial composition profile
   -n int, --number int  how many profiles to plot, equispaced by interest
@@ -115,6 +117,11 @@ optional arguments:
   --xlin                force lin scale on x axis
   --ylin                force lin scale on y axis
   --PDF                 produce PDFs of the plots
+  -s, --show            open plot in window
+  --spacing str         how to equispace profiles, by mass, age, or model
+  --skip-first          don't plot the first profile model
+  --no-legend           don't plot the legend
+
 ```
 To create a simple HR plot, one would simply run `./tuya.py -D name --HR`, and more complicated options can be added as needed.
 

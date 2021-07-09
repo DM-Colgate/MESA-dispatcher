@@ -289,8 +289,12 @@ def main():
     parser.add_argument("--dMdt", help="plot total mass over time", action='store_true')
     parser.add_argument("--dRdt", help="plot total radius over time", action='store_true')
     parser.add_argument("--dLdt", help="plot total luminosity over time, by source", action='store_true')
+    parser.add_argument("--derrdt", help="plot rel_E_err over time", action='store_true')
+    parser.add_argument("--drunerrdt", help="plot rel_run_E_err over time", action='store_true')
     parser.add_argument("--dEddMaxdt", help="plot maximum Eddington factor over time", action='store_true')
     parser.add_argument("--rho", help="plot radial density profile", action='store_true')
+    parser.add_argument("--dm", help="plot radial mass per cell profile", action='store_true')
+    parser.add_argument("--cell", help="plot radial profile of cells", action='store_true')
     parser.add_argument("--P", help="plot radial pressure profile", action='store_true')
     parser.add_argument("--T", help="plot radial temperature profile", action='store_true')
     parser.add_argument("--L", help="plot radial luminosity profile, by source", action='store_true')
@@ -698,6 +702,184 @@ def main():
         name = filename + "_dLdt" 
         save_plt(plt, name, args)
 
+    # error
+    if args.derrdt:
+        progbarinit(len(history))
+        for i in range(len(history)):
+            # make actual plot
+            plt.plot(history[i].star_age, history[i].rel_E_err, color=vir(i / len(history)), ls = '-', linewidth=2, label=hist_lab[i])
+            progbar()
+        progbarend()
+
+        # add ZAMS anotation
+        mass100 = False
+        mass200 = False
+        mass300 = False
+        mass400 = False
+        mass500 = False
+        mass600 = False
+        mass700 = False
+        mass800 = False
+        mass900 = False
+        mass1000 = False
+
+        # for all timesteps in a star
+        progbarinit(len(history))
+        for j in range(len(history[i].star_age)):
+            # write to stdout
+            l = len(history[i].star_age)
+            a = j
+            progbar()
+
+            # annotations
+            if abs(history[i].star_mass[j] - 100.0) < 0.1 and mass100 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(2/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass100 = True
+
+            if abs(history[i].star_mass[j] - 200.0) < 0.1 and mass200 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(3/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass200 = True
+
+            if abs(history[i].star_mass[j] - 300.0) < 0.1 and mass300 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(4/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass300 = True
+
+            if abs(history[i].star_mass[j] - 400.0) < 0.1 and mass400 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(5/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass400 = True
+
+            if abs(history[i].star_mass[j] - 500.0) < 0.1 and mass500 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(6/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass500 = True
+
+            if abs(history[i].star_mass[j] - 600.0) < 0.1 and mass600 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(7/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass600 = True
+
+            if abs(history[i].star_mass[j] - 700.0) < 0.1 and mass700 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(8/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass700 = True
+
+            if abs(history[i].star_mass[j] - 800.0) < 0.1 and mass800 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(9/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass800 = True
+
+            if abs(history[i].star_mass[j] - 900.0) < 0.1 and mass900 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(10/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass900 = True
+
+            if abs(history[i].star_mass[j] - 1000.0) < 0.1 and mass1000 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(11/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass1000 = True
+
+        # make the plot
+        progbarend()
+        plt.title("Energy Conservation Error Over Time: " + filename)
+        plt.ylabel('Error')
+        plt.yscale('log')
+        plt.xlabel('Age [yr]')
+        name = filename + "_derrdt" 
+        save_plt(plt, name, args)
+
+    # error
+    if args.drunerrdt:
+        progbarinit(len(history))
+        for i in range(len(history)):
+            # make actual plot
+            plt.plot(history[i].star_age, history[i].rel_run_E_err, color=vir(i / len(history)), ls = '-', linewidth=2, label=hist_lab[i])
+            progbar()
+        progbarend()
+
+        # add ZAMS anotation
+        mass100 = False
+        mass200 = False
+        mass300 = False
+        mass400 = False
+        mass500 = False
+        mass600 = False
+        mass700 = False
+        mass800 = False
+        mass900 = False
+        mass1000 = False
+
+        # for all timesteps in a star
+        progbarinit(len(history))
+        for j in range(len(history[i].star_age)):
+            # write to stdout
+            l = len(history[i].star_age)
+            a = j
+            progbar()
+
+            # annotations
+            if abs(history[i].star_mass[j] - 100.0) < 0.1 and mass100 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(2/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass100 = True
+
+            if abs(history[i].star_mass[j] - 200.0) < 0.1 and mass200 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(3/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass200 = True
+
+            if abs(history[i].star_mass[j] - 300.0) < 0.1 and mass300 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(4/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass300 = True
+
+            if abs(history[i].star_mass[j] - 400.0) < 0.1 and mass400 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(5/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass400 = True
+
+            if abs(history[i].star_mass[j] - 500.0) < 0.1 and mass500 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(6/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass500 = True
+
+            if abs(history[i].star_mass[j] - 600.0) < 0.1 and mass600 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(7/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass600 = True
+
+            if abs(history[i].star_mass[j] - 700.0) < 0.1 and mass700 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(8/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass700 = True
+
+            if abs(history[i].star_mass[j] - 800.0) < 0.1 and mass800 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(9/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass800 = True
+
+            if abs(history[i].star_mass[j] - 900.0) < 0.1 and mass900 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(10/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass900 = True
+
+            if abs(history[i].star_mass[j] - 1000.0) < 0.1 and mass1000 == False:
+                plt.scatter(history[i].star_age[j], history[i].radius[j], color=palette(11/12), s=20)
+                plt.annotate(str(round(history[i].star_mass[j])) + " $M_{\odot}$", (history[i].star_age[j], history[i].radius[j]))
+                mass1000 = True
+
+        # make the plot
+        progbarend()
+        plt.title("Cumulative Energy Conservation Error Over Time: " + filename)
+        plt.ylabel('Cumulative Error')
+        plt.yscale('log')
+        plt.xlabel('Age [yr]')
+        name = filename + "_drunerrdt" 
+        save_plt(plt, name, args)
+
     # massif
     if args.dMdt:
         progbarinit(len(history))
@@ -818,6 +1000,71 @@ def main():
         plt.yscale('log')
         plt.xlabel('Radius [$R_{\odot}$]')
         name = filename + "_rho" 
+        save_plt(plt, name, args)
+
+    # mass per cell 
+    if args.dm:
+        for j in range(len(mrdirs)):
+            # loop thru different profile files
+            progbarinit(len(profs[j]))
+            for i in range(len(profs[j])):
+                # progress bar
+                progbar()
+
+                # is this one we want to plot?
+                spacing = space(args, history[j], profs[j])
+
+                # modulo
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
+                    # get profile info from MESA reader
+                    dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
+
+                    # make actual plot
+                    plt.plot(dat.radius, dat.dm,
+                            color=vir(dat.star_age / history[j].star_age[-1]),
+                            ls = '-',
+                            linewidth=1,
+                            label=lab)
+
+        # plot the plot
+        progbarend()
+        plt.title("Cell Mass Profile: " + filename)
+        plt.ylabel('Cell Mass [g]')
+        plt.yscale('log')
+        plt.xlabel('Radius [$R_{\odot}$]')
+        name = filename + "_dm" 
+        save_plt(plt, name, args)
+
+    # mass per cell 
+    if args.cell:
+        for j in range(len(mrdirs)):
+            # loop thru different profile files
+            progbarinit(len(profs[j]))
+            for i in range(len(profs[j])):
+                # progress bar
+                progbar()
+
+                # is this one we want to plot?
+                spacing = space(args, history[j], profs[j])
+
+                # modulo
+                if spacechk(i, args, history[j], profs[j], spacing) == 0:
+                    # get profile info from MESA reader
+                    dat, lab, mmm = mesa_prof(mrdirs[j], profs[j][i])
+
+                    # make actual plot
+                    plt.vlines(dat.radius, 0, 1,
+                            colors=vir(dat.star_age / history[j].star_age[-1]),
+                            linestyles = '-',
+                            linewidth=0.5,
+                            label=lab)
+
+        # plot the plot
+        progbarend()
+        plt.title("MESA Cells" + filename)
+        plt.xscale('log')
+        plt.xlabel('Radius [$R_{\odot}$]')
+        name = filename + "_cell" 
         save_plt(plt, name, args)
 
     # crock pot
